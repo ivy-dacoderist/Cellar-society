@@ -1,0 +1,92 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Orders - Cellar Society{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Order Management</h2>
+    <p>View customer orders (Order processing queue managed by customer side)</p>
+</div>
+
+<!-- Filter Bar -->
+<div class="card">
+    <form method="GET" class="search-bar">
+        <select name="status" onchange="this.form.submit()">
+            <option value="">All Statuses</option>
+            <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+            <option value="Processing" {% if status_filter == 'Processing' %}selected{% endif %}>Processing</option>
+            <option value="Delivered" {% if status_filter == 'Delivered' %}selected{% endif %}>Delivered</option>
+            <option value="Received" {% if status_filter == 'Received' %}selected{% endif %}>Received</option>
+            <option value="Cancelled" {% if status_filter == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+        
+        <a href="{{ url_for('orders') }}" class="btn ghost">Clear Filter</a>
+    </form>
+</div>
+
+<!-- Orders Table -->
+<div class="card">
+    <h3>All Orders ({{ orders|length }})</h3>
+    
+    {% if orders %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Email</th>
+                    <th>Product</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                    <th>Order Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td><strong>#{{ order.id }}</strong></td>
+                    <td>{{ order.customer_name }}</td>
+                    <td>{{ order.customer_email }}</td>
+                    <td><strong>{{ order.product_name }}</strong></td>
+                    <td><span class="badge primary">{{ order.product_type }}</span></td>
+                    <td>{{ order.quantity }}</td>
+                    <td><strong>₱{{ "%.2f"|format(order.total_price) }}</strong></td>
+                    <td>
+                        {% if order.status == 'Pending' %}
+                            <span class="badge warning">⏳ {{ order.status }}</span>
+                        {% elif order.status == 'Processing' %}
+                            <span class="badge primary">🔄 {{ order.status }}</span>
+                        {% elif order.status == 'Delivered' %}
+                            <span class="badge success">🚚 {{ order.status }}</span>
+                        {% elif order.status == 'Received' %}
+                            <span class="badge success">✅ {{ order.status }}</span>
+                        {% elif order.status == 'Cancelled' %}
+                            <span class="badge danger">❌ {{ order.status }}</span>
+                        {% else %}
+                            <span class="badge">{{ order.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ order.order_date[:10] }}</td>
+                    <td>
+                        <a href="{{ url_for('order_detail', order_id=order.id) }}" class="btn btn-small primary">View Details</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>No Orders Found</h3>
+        <p>Customer orders will appear here.</p>
+        <p style="margin-top: 8px; color: var(--muted); font-size: 14px;">Orders are created through the customer portal.</p>
+    </div>
+    {% endif %}
+</div>
+
+
+{% endblock %}

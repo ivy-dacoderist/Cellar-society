@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Customers - Cellar Society{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Customer Accounts</h2>
+    <p>View and manage customer accounts (customers register via customer portal)</p>
+</div>
+
+<!-- Search Bar -->
+<div class="card">
+    <form method="GET" class="search-bar">
+        <input type="text" name="search" placeholder="Search by customer name or email..." value="{{ search }}">
+        <button type="submit" class="btn primary">Search</button>
+        <a href="{{ url_for('customers') }}" class="btn ghost">Clear</a>
+    </form>
+</div>
+
+<!-- Customers Table -->
+<div class="card">
+    <h3>Registered Customers ({{ customers|length }})</h3>
+    
+    {% if customers %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Joined Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td><strong>#{{ customer.id }}</strong></td>
+                    <td><strong style="color: var(--primary);">{{ customer.name }}</strong></td>
+                    <td>{{ customer.email }}</td>
+                    <td>{{ customer.phone if customer.phone else '-' }}</td>
+                    <td>{{ customer.address if customer.address else '-' }}</td>
+                    <td>{{ customer.joined_at[:10] }}</td>
+                    <td>
+                        <a href="{{ url_for('customer_detail', customer_id=customer.id) }}" class="btn btn-small primary">View Details</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>No Customers Yet</h3>
+        <p>Customer registrations will appear here.</p>
+        <p style="margin-top: 8px; color: var(--muted); font-size: 14px;">Customers register through the customer portal.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Info Box -->
+<div class="card" style="background: rgba(198, 166, 100, 0.05); border-left: 4px solid var(--accent);">
+    <h3>ℹ️ About Customer Management</h3>
+    <p style="font-size: 14px; line-height: 1.8; color: var(--muted);">
+        As an admin, you can <strong>view</strong> customer information but cannot directly create or edit customer accounts.
+        Customers will register and manage their accounts through the <strong>Customer Portal</strong>.
+        This separation ensures proper access control and data security.
+    </p>
+</div>
+{% endblock %}
